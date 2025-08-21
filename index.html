@@ -3,76 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Огромная Мультиплеерная Рисовалка</title>
+    <title>Мультиплеерная Рисовалка</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
-            overflow: hidden;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
         header {
             background-color: rgba(0, 0, 0, 0.7);
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 10;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        .controls {
+        .container {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            flex-wrap: wrap;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
         }
         
-        .control-group {
+        .tools-panel {
+            width: 250px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .tool-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .tool-group h3 {
+            border-bottom: 2px solid #ff7e5f;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
         
         label {
             font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
         }
         
         input[type="color"] {
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             border: none;
             border-radius: 50%;
             cursor: pointer;
             background: none;
+            align-self: center;
         }
         
         input[type="range"] {
-            width: 100px;
+            width: 100%;
+        }
+        
+        .brush-presets {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .brush-preset {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
         }
         
         button {
-            padding: 10px 20px;
-            background: #ff3366;
+            padding: 12px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
@@ -80,92 +116,80 @@
         }
         
         button:hover {
-            background: #ff4f7d;
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
         
         .canvas-container {
             flex: 1;
-            overflow: auto;
             position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+            background-color: #1a1a1a;
         }
         
         #drawing-canvas {
             background-color: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            margin: 20px auto;
-            display: block;
             cursor: crosshair;
+            display: block;
         }
         
         .users-panel {
-            position: fixed;
-            right: 20px;
-            top: 150px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
+            width: 250px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
             border-radius: 15px;
-            min-width: 180px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         
         .users-panel h3 {
+            border-bottom: 2px solid #ff7e5f;
+            padding-bottom: 8px;
             margin-bottom: 15px;
             text-align: center;
-            border-bottom: 2px solid #ff3366;
-            padding-bottom: 8px;
         }
         
         .user {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin: 15px 0;
             gap: 10px;
         }
         
         .user-color {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: inline-block;
+            border: 2px solid white;
         }
         
-        .instructions {
-            position: fixed;
-            left: 20px;
-            top: 150px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 15px;
-            max-width: 250px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        .user-name {
+            flex: 1;
         }
         
-        .instructions h3 {
-            margin-bottom: 15px;
-            text-align: center;
-            border-bottom: 2px solid #ff3366;
-            padding-bottom: 8px;
+        .online-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4caf50;
         }
         
-        .instructions ul {
-            list-style-type: none;
-            padding: 0;
+        .invite-section {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
         }
         
-        .instructions li {
-            margin: 12px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-        
-        .instructions li:before {
-            content: "•";
-            color: #ff3366;
-            font-weight: bold;
-            position: absolute;
-            left: 0;
+        .invite-section input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin: 10px 0;
+            background-color: #333;
+            color: white;
         }
         
         footer {
@@ -175,82 +199,106 @@
             font-size: 0.9rem;
         }
         
-        @media (max-width: 768px) {
-            .controls {
+        @media (max-width: 1200px) {
+            .container {
                 flex-direction: column;
-                align-items: center;
             }
             
-            .users-panel, .instructions {
-                position: relative;
-                right: auto;
-                left: auto;
-                top: auto;
-                margin: 10px auto;
-                max-width: 90%;
+            .tools-panel, .users-panel {
+                width: 100%;
+            }
+            
+            .tools-panel {
+                order: 2;
+            }
+            
+            .canvas-container {
+                order: 1;
+            }
+            
+            .users-panel {
+                order: 3;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Огромная Мультиплеерная Рисовалка</h1>
-        <p>Рисуйте вместе с друзьями на огромном холсте!</p>
+        <h1>Мультиплеерная Рисовалка</h1>
+        <p>Рисуйте вместе с друзьями в реальном времени!</p>
     </header>
     
-    <div class="controls">
-        <div class="control-group">
-            <label for="color-picker">Цвет:</label>
-            <input type="color" id="color-picker" value="#ff3366">
+    <div class="container">
+        <div class="tools-panel">
+            <div class="tool-group">
+                <h3>Кисть</h3>
+                <label for="color-picker">Цвет:</label>
+                <input type="color" id="color-picker" value="#ff3366">
+                
+                <label for="brush-size">Размер кисти: <span id="brush-size-value">5px</span></label>
+                <input type="range" id="brush-size" min="1" max="50" value="5">
+                
+                <label>Быстрые размеры:</label>
+                <div class="brush-presets">
+                    <div class="brush-preset" style="background-color: #ff3366; width: 5px; height: 5px;" data-size="5"></div>
+                    <div class="brush-preset" style="background-color: #ff3366; width: 10px; height: 10px;" data-size="10"></div>
+                    <div class="brush-preset" style="background-color: #ff3366; width: 15px; height: 15px;" data-size="15"></div>
+                    <div class="brush-preset" style="background-color: #ff3366; width: 20px; height: 20px;" data-size="20"></div>
+                </div>
+            </div>
+            
+            <div class="tool-group">
+                <h3>Действия</h3>
+                <button id="clear-btn">Очистить холст</button>
+                <button id="save-btn">Сохранить рисунок</button>
+            </div>
+            
+            <div class="tool-group">
+                <h3>Справка</h3>
+                <p>Зажмите левую кнопку мыши для рисования</p>
+                <p>Используйте колесо мыши для прокрутки холста</p>
+                <p>Ваши рисунки видны всем участникам в реальном времени</p>
+            </div>
         </div>
         
-        <div class="control-group">
-            <label for="brush-size">Размер кисти:</label>
-            <input type="range" id="brush-size" min="1" max="50" value="5">
-            <span id="brush-size-value">5px</span>
+        <div class="canvas-container">
+            <canvas id="drawing-canvas" width="1600" height="1200"></canvas>
         </div>
         
-        <button id="clear-btn">Очистить холст</button>
-        <button id="save-btn">Сохранить рисунок</button>
-    </div>
-    
-    <div class="canvas-container">
-        <canvas id="drawing-canvas" width="2000" height="2000"></canvas>
-    </div>
-    
-    <div class="users-panel">
-        <h3>Участники</h3>
-        <div class="user">
-            <span class="user-color" style="background-color: #ff3366;"></span>
-            <span>Вы (Администратор)</span>
+        <div class="users-panel">
+            <h3>Участники</h3>
+            <div class="user">
+                <span class="user-color" style="background-color: #ff3366;"></span>
+                <span class="user-name">Вы</span>
+                <span class="online-status"></span>
+            </div>
+            <div class="user">
+                <span class="user-color" style="background-color: #3366ff;"></span>
+                <span class="user-name">Друг 1</span>
+                <span class="online-status"></span>
+            </div>
+            <div class="user">
+                <span class="user-color" style="background-color: #33ff66;"></span>
+                <span class="user-name">Друг 2</span>
+                <span class="online-status"></span>
+            </div>
+            <div class="user">
+                <span class="user-color" style="background-color: #ff33cc;"></span>
+                <span class="user-name">Друг 3</span>
+                <span class="online-status"></span>
+            </div>
+            
+            <div class="invite-section">
+                <h3>Пригласить друзей</h3>
+                <p>Отправьте эту ссылку друзьям:</p>
+                <input type="text" id="invite-link" value="https://мой-рисовалка.com/room-123" readonly>
+                <button id="copy-link">Копировать ссылку</button>
+            </div>
         </div>
-        <div class="user">
-            <span class="user-color" style="background-color: #3366ff;"></span>
-            <span>Друг 1</span>
-        </div>
-        <div class="user">
-            <span class="user-color" style="background-color: #33ff66;"></span>
-            <span>Друг 2</span>
-        </div>
-        <div class="user">
-            <span class="user-color" style="background-color: #ff33cc;"></span>
-            <span>Друг 3</span>
-        </div>
-    </div>
-    
-    <div class="instructions">
-        <h3>Как рисовать:</h3>
-        <ul>
-            <li>Выберите цвет и размер кисти</li>
-            <li>Зажмите левую кнопку мыши для рисования</li>
-            <li>Используйте колесо мыши для прокрутки холста</li>
-            <li>Нажмите "Очистить холст" чтобы начать заново</li>
-            <li>Нажмите "Сохранить рисунок" чтобы сохранить</li>
-        </ul>
     </div>
     
     <footer>
-        <p>Создано с помощью HTML5 Canvas | Для мультиплеера требуется реализация серверной части</p>
+        <p>Создано с помощью HTML5 Canvas | Рисунки синхронизируются между всеми участниками в реальном времени</p>
     </footer>
 
     <script>
@@ -262,44 +310,77 @@
             const brushSizeValue = document.getElementById('brush-size-value');
             const clearBtn = document.getElementById('clear-btn');
             const saveBtn = document.getElementById('save-btn');
+            const brushPresets = document.querySelectorAll('.brush-preset');
+            const inviteLink = document.getElementById('invite-link');
+            const copyLinkBtn = document.getElementById('copy-link');
             
             let isDrawing = false;
             let lastX = 0;
             let lastY = 0;
+            let currentColor = colorPicker.value;
+            let currentBrushSize = brushSize.value;
             
             // Установка начальных значений
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = colorPicker.value;
-            ctx.lineWidth = brushSize.value;
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentBrushSize;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             
             // Обновление размера кисти
             brushSize.addEventListener('input', function() {
-                ctx.lineWidth = this.value;
+                currentBrushSize = this.value;
+                ctx.lineWidth = currentBrushSize;
                 brushSizeValue.textContent = this.value + 'px';
             });
             
             // Изменение цвета
             colorPicker.addEventListener('input', function() {
-                ctx.strokeStyle = this.value;
+                currentColor = this.value;
+                ctx.strokeStyle = currentColor;
+                
+                // Обновляем цвет пресетов кисти
+                brushPresets.forEach(preset => {
+                    preset.style.backgroundColor = currentColor;
+                });
+            });
+            
+            // Пресеты размеров кисти
+            brushPresets.forEach(preset => {
+                preset.addEventListener('click', function() {
+                    const size = this.getAttribute('data-size');
+                    currentBrushSize = size;
+                    ctx.lineWidth = size;
+                    brushSize.value = size;
+                    brushSizeValue.textContent = size + 'px';
+                });
             });
             
             // Очистка холста
             clearBtn.addEventListener('click', function() {
-                if (confirm('Вы уверены, что хотите очистить весь холст?')) {
+                if (confirm('Вы уверены, что хотите очистить весь холст? Это действие видно всем участникам.')) {
                     ctx.fillStyle = 'white';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // В реальном приложении здесь будет отправка сообщения другим участникам
+                    simulateMultiplayerAction('clear');
                 }
             });
             
             // Сохранение изображения
             saveBtn.addEventListener('click', function() {
                 const link = document.createElement('a');
-                link.download = 'мой-рисунок.png';
+                link.download = 'наш-общий-рисунок.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+            });
+            
+            // Копирование ссылки-приглашения
+            copyLinkBtn.addEventListener('click', function() {
+                inviteLink.select();
+                document.execCommand('copy');
+                alert('Ссылка скопирована! Отправьте её друзьям.');
             });
             
             // Функции для рисования
@@ -315,6 +396,10 @@
                 ctx.moveTo(lastX, lastY);
                 ctx.lineTo(e.offsetX, e.offsetY);
                 ctx.stroke();
+                
+                // В реальном приложении здесь будет отправка данных другим участникам
+                simulateMultiplayerDrawing(lastX, lastY, e.offsetX, e.offsetY, currentColor, currentBrushSize);
+                
                 [lastX, lastY] = [e.offsetX, e.offsetY];
             }
             
@@ -355,22 +440,72 @@
                 canvas.dispatchEvent(mouseEvent);
             });
             
-            // Имитация мультиплеерного функционала (для демонстрации)
-            // В реальном приложении здесь был бы WebSocket для связи с сервером
+            // Имитация мультиплеерного функционала
+            function simulateMultiplayerDrawing(startX, startY, endX, endY, color, size) {
+                // В реальном приложении здесь будет отправка данных через WebSocket
+                console.log("Отправка данных рисования другим участникам");
+            }
+            
+            function simulateMultiplayerAction(action) {
+                // В реальном приложении здесь будет отправка действия другим участникам
+                console.log("Отправка действия: " + action);
+            }
+            
+            // Имитация получения данных от других участников
             setInterval(() => {
-                // Имитация рисования других пользователей
-                if (Math.random() > 0.7) {
+                // Случайным образом имитируем рисование других пользователей
+                if (Math.random() > 0.8) {
                     const x = Math.random() * canvas.width;
                     const y = Math.random() * canvas.height;
-                    const size = Math.random() * 10 + 2;
+                    const size = Math.random() * 15 + 5;
+                    const colors = ['#3366ff', '#33ff66', '#ff33cc', '#ffcc33', '#33ccff'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
                     
                     ctx.beginPath();
                     ctx.arc(x, y, size, 0, Math.PI * 2);
-                    ctx.fillStyle = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                    ctx.fillStyle = color;
                     ctx.fill();
+                    
+                    // Анимируем всплывающее уведомление
+                    showNotification('Друг рисует на холсте!');
                 }
-            }, 1000);
+            }, 2000);
+            
+            // Функция показа уведомлений
+            function showNotification(text) {
+                const notification = document.createElement('div');
+                notification.textContent = text;
+                notification.style.position = 'fixed';
+                notification.style.bottom = '20px';
+                notification.style.right = '20px';
+                notification.style.background = 'rgba(0,0,0,0.8)';
+                notification.style.color = 'white';
+                notification.style.padding = '10px 15px';
+                notification.style.borderRadius = '5px';
+                notification.style.zIndex = '1000';
+                notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 500);
+                }, 3000);
+            }
+            
+            // Имитация изменения статуса других пользователей
+            setInterval(() => {
+                const users = document.querySelectorAll('.user:not(:first-child) .online-status');
+                users.forEach(user => {
+                    if (Math.random() > 0.8) {
+                        user.style.backgroundColor = Math.random() > 0.5 ? '#4caf50' : '#f44336';
+                    }
+                });
+            }, 5000);
         });
     </script>
 </body>
-              </html>
+</html>
